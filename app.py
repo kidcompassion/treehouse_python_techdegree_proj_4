@@ -26,11 +26,14 @@ def submenu():
     pass
 
 
+def clean_date(date_str):
+    
+    cleaned_date = date_str.split('/')
+    #return cleaned_date
+    formatted_date = datetime.date(int(cleaned_date[2]), int(cleaned_date[0]), int(cleaned_date[1]))
+    return formatted_date
 
-def clean_date():
-    pass
-
-def clean_price():
+def clean_price(price_str):
     pass
 
 def clean_id():
@@ -56,16 +59,30 @@ def export_csv():
 
 
 def add_csv():
+    counter = 0
     with open('inventory.csv') as csvfile:
         incoming_data = csv.reader(csvfile)
-        for row in incoming_data:
-            product_name = row[0]
-            product_price = row[1]
-            product_quantity = row[2]
-            date_updated = row[3]
-            new_product = Product(product_name = product_name, product_price = product_price, product_quantity = product_quantity, date_updated=date_updated)
-            print(new_product)
-            #individual_product = session.query(Product).filter(Product.product_name == row[0]).one_or_none()
+        #
+        next(incoming_data)
+        
+        for row in incoming_data:  
+            print(clean_date(row[3]))
+                
+            #pass
+        #filter out header cell
+            # Check if the product already exists
+            #product_exists = session.query(Product).filter(Product.product_name == row[0]).one_or_none()
+                
+            # product_name = row[0]
+            # product_price = row[1]
+            # product_quantity = row[2]
+            # date_updated = clean_date(row[3])
+            # new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = product_price, date_updated=date_updated)
+            # print(new_product)
+            #session.add(new_product)
+        
+       # session.commit()
+          
    
    
 
@@ -100,3 +117,5 @@ def app():
 
 if __name__ == '__main__':
     add_csv()
+    #clean_date("2019/2/21")
+   

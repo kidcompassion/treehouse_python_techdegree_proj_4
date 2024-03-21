@@ -10,10 +10,10 @@ Base = declarative_base()
 class Product(Base):
     __tablename__ = 'inventory'
     product_id = Column(Integer, primary_key=True)
-    product_name = Column('name', String)
-    product_quantity = Column('Quantity',Integer)
-    product_price = Column('Price', Integer)
-    date_updated = Column('Date updated', Date)
+    product_name = Column('product_name', String)
+    product_quantity = Column('product_quantity',Integer)
+    product_price = Column('product_price', Integer)
+    date_updated = Column('date_updated', Date)
 
 
     def __repr__(self):
