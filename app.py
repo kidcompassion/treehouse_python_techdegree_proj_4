@@ -27,14 +27,18 @@ def submenu():
 
 
 def clean_date(date_str):
-    
+    # Split date from CSV
     cleaned_date = date_str.split('/')
-    #return cleaned_date
+    # Pass date into datetime obj correctly in Y, M, d
     formatted_date = datetime.date(int(cleaned_date[2]), int(cleaned_date[0]), int(cleaned_date[1]))
     return formatted_date
 
 def clean_price(price_str):
-    pass
+    cleaned_price = price_str.split("$")
+    cleaned_price = float(cleaned_price[1])*100
+    cleaned_price = str(cleaned_price).split('.')
+    cleaned_price = int(cleaned_price[0])
+    return cleaned_price
 
 def clean_id():
     pass
@@ -57,31 +61,36 @@ def export_csv():
 
 
 
+def display_price(cleaned_price):
+    return cleaned_price/100
+
 
 def add_csv():
     counter = 0
     with open('inventory.csv') as csvfile:
         incoming_data = csv.reader(csvfile)
-        #
+        # Skip the header row
         next(incoming_data)
-        
         for row in incoming_data:  
-            print(clean_date(row[3]))
-                
-            #pass
+            #desc - row0
+            #price row1
+            #qtyrow2
+            #daterow3
+
+          
         #filter out header cell
             # Check if the product already exists
             #product_exists = session.query(Product).filter(Product.product_name == row[0]).one_or_none()
                 
-            # product_name = row[0]
-            # product_price = row[1]
-            # product_quantity = row[2]
-            # date_updated = clean_date(row[3])
-            # new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = product_price, date_updated=date_updated)
-            # print(new_product)
-            #session.add(new_product)
+            product_name = row[0]
+            product_price = clean_price(row[1])
+            product_quantity = int(row[2])
+            date_updated = clean_date(row[3])
+            new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = product_price, date_updated=date_updated)
+            print(new_product)
+            session.add(new_product)
         
-       # session.commit()
+        session.commit()
           
    
    
@@ -116,6 +125,7 @@ def app():
 
 
 if __name__ == '__main__':
+    Base.metadata.create_all(engine)
     add_csv()
     #clean_date("2019/2/21")
    
