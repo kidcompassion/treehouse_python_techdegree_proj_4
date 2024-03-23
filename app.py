@@ -11,19 +11,27 @@ def menu():
         \r Enter A to add a new product
         \r Enter B to generate a backup of database contents
         ''')
-    selected = input(" What would you like to do?").upper()
+    selected = input(" What would you like to do? ").upper()
 
     # Validate user's entry
     if selected in ['V','A','B']:
-            return selected
+        submenu(selected)
     else:
         input('''
                 \n Your selection was not valid.
                 \r Press enter to review your options and try again.
             ''')
 
-def submenu():
-    pass
+def submenu(selection):
+    if selection == "V":
+        requested_id = input("Enter ID of product ")
+        display_product(requested_id)
+    elif selection == "A":
+        print("Add new product")
+    elif selection =="B":
+        print("Export DB")
+    else:
+        pass
 
 
 def clean_date(date_str):
@@ -44,8 +52,13 @@ def clean_id():
     pass
 
 
-def display_product():
-    pass
+def display_product(product_id):
+    # get inputted id
+    # query for item with matching id
+    selected_product = session.query(Product).filter(Product.product_id==product_id).first()
+    # return product info
+  
+    print(selected_product)
 
 def add_product():
     pass
@@ -72,23 +85,15 @@ def add_csv():
         # Skip the header row
         next(incoming_data)
         for row in incoming_data:  
-            #desc - row0
-            #price row1
-            #qtyrow2
-            #daterow3
-
-          
-        #filter out header cell
-            # Check if the product already exists
-            #product_exists = session.query(Product).filter(Product.product_name == row[0]).one_or_none()
-                
-            product_name = row[0]
-            product_price = clean_price(row[1])
-            product_quantity = int(row[2])
-            date_updated = clean_date(row[3])
-            new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = product_price, date_updated=date_updated)
-            print(new_product)
-            session.add(new_product)
+            product_exists = session.query(Product).filter(Product.product_name==row[0]).one_or_none()
+            if product_exists == None:      
+                product_name = row[0]
+                product_price = clean_price(row[1])
+                product_quantity = int(row[2])
+                date_updated = clean_date(row[3])
+                new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = product_price, date_updated=date_updated)
+                print(new_product)
+                session.add(new_product)
         
         session.commit()
           
@@ -116,7 +121,9 @@ def add_csv():
 
 
 def app():
-    pass
+    app_running = True
+    while app_running:
+        menu()
 
 
 
@@ -126,6 +133,7 @@ def app():
 
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
-    add_csv()
+    app()
+    #add_csv()
     #clean_date("2019/2/21")
    
