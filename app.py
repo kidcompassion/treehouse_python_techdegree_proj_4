@@ -27,7 +27,7 @@ def submenu(selection):
         requested_id = input("Enter ID of product ")
         display_product(requested_id)
     elif selection == "A":
-        print("Add new product")
+        add_product()
     elif selection =="B":
         print("Export DB")
     else:
@@ -51,26 +51,50 @@ def clean_price(price_str):
 def clean_id():
     pass
 
+# Create a function to handle getting and displaying a product by its product_id.
 
-def display_product(product_id):
-    # get inputted id
-    # query for item with matching id
+def display_product(product_id):     
+    # Query to retrieve product matching requested ID
     selected_product = session.query(Product).filter(Product.product_id==product_id).first()
-    # return product info
-  
-    print(selected_product)
+    # Print product details
+    print(f'''
+        \nID: {selected_product.product_id}
+        \rProduct: {selected_product.product_name}
+        \rQuantity Available: {selected_product.product_quantity}
+        \rPrice: ${display_price(selected_product.product_price)}
+        \rLast updated: {selected_product.date_updated}
+    ''')
+    # Delay the next step for a second, just to make it nicer for the user when reading
+    time.sleep(1)
+    # Let the user go back to the main menu
+    input("Press ENTER to return to the main menu, whenver you are ready.")
 
 def add_product():
-    pass
+    #new_product = []
+    # prompt the user to enter the product's name, quantity, and price
+    product_name = input("What is the product's name?")
+    product_quantity = input("How many are there?")
+    product_price = input(" Enter price in $0.00 format")
+    new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = clean_price(product_price), date_updated = datetime.datetime.now())
+    session.add(new_product)
+    session.commit()
+  
+    # process the user-provided value for price from a string to an int
+    # Be sure the value you stored for the price field to the database is converted to cents ($2.99 becomes 299, for example).
+    print(new_product)
 
 def update_product():
     pass
 
-def delete_product():
-    pass
+def delete_product(product_id):
+    session.query(Product).filter(Product.product_id==product_id).delete()
+    session.commit()
+    #selected_product = session.query(Product).filter(Product.product_id==product_id).first()
+
 
 def export_csv():
     pass
+    #Create a function to handle making a backup of the database. The backup should be written to a .csv file.
 
 
 
