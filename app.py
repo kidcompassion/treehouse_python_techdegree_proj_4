@@ -48,33 +48,77 @@ def clean_price(price_str):
     cleaned_price = int(cleaned_price[0])
     return cleaned_price
 
-def clean_id():
-    pass
 
+def get_all_ids():
+    all_results = []
+    for product in session.query(Product):
+        all_results.append(product.product_id)
+        
+    return all_results
+
+
+# Check that entered IDs are 1) integers and 2) included in the list of active product IDs
+def clean_id(str_id, all_values):
+
+    try:
+        # Check that entered value is an integer
+        selected_id = int(str_id)
+    except ValueError:
+        input('''
+                \n *** Sorry, that's not a valid number. ***
+                \r Press Enter to return to the main menu and try your request again.
+            ''')
+    else:
+        # if entered value is an integer, check if it's an active product ID
+        if selected_id in all_values:
+            return selected_id
+        else:
+            input('''
+                \n ***Sorry, that's not a valid product ID.***
+                \r Press Enter to return to the main menu and try your request again.
+            ''')
+
+       
 # Create a function to handle getting and displaying a product by its product_id.
+def display_product(product_id):    
 
-def display_product(product_id):     
-    # Query to retrieve product matching requested ID
-    selected_product = session.query(Product).filter(Product.product_id==product_id).first()
-    # Print product details
-    print(f'''
-        \nID: {selected_product.product_id}
-        \rProduct: {selected_product.product_name}
-        \rQuantity Available: {selected_product.product_quantity}
-        \rPrice: ${display_price(selected_product.product_price)}
-        \rLast updated: {selected_product.date_updated}
-    ''')
-    # Delay the next step for a second, just to make it nicer for the user when reading
-    time.sleep(1)
-    # Let the user go back to the main menu
-    input("Press ENTER to return to the main menu, whenver you are ready.")
+    # assume there is an error
+    id_error = True 
 
+    # get list of all valid product ids
+    all_ids = get_all_ids()
+
+    # pass requested id and list of ids into cleaning function. 
+    # it will return either a valid int, or a value of None
+    id_selected = clean_id(product_id, all_ids)
+
+    # if it does not return None, assume the value is okay and switch off the error, 
+    if id_selected != None:
+        id_error = False
+
+    while id_error == False:
+        # Query to retrieve product matching requested ID
+        selected_product = session.query(Product).filter(Product.product_id==product_id).first()
+        # Print product details
+        print(f'''
+            \nID: {selected_product.product_id}
+            \rProduct: {selected_product.product_name}
+            \rQuantity Available: {selected_product.product_quantity}
+            \rPrice: ${display_price(selected_product.product_price)}
+            \rLast updated: {selected_product.date_updated}
+        ''')
+        # Delay the next step for a second, just to make it nicer for the user when reading
+        time.sleep(1)
+        # Let the user go back to the main menu
+        input("Press ENTER to return to the main menu, whenver you are ready.")
+
+
+# Create a function to handle adding a new product to the database.   
 def add_product():
-    #new_product = []
     # prompt the user to enter the product's name, quantity, and price
     product_name = input("What is the product's name?")
     product_quantity = input("How many are there?")
-    product_price = input(" Enter price in $0.00 format")
+    product_price = input("Enter price in $0.00 format.")
     new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = clean_price(product_price), date_updated = datetime.datetime.now())
     session.add(new_product)
     session.commit()
@@ -158,6 +202,5 @@ def app():
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
     app()
-    #add_csv()
-    #clean_date("2019/2/21")
+
    
