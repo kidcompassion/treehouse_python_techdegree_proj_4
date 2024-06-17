@@ -111,6 +111,7 @@ def display_product(product_id):
         time.sleep(1)
         # Let the user go back to the main menu
         input("Press ENTER to return to the main menu, whenver you are ready.")
+        menu()
 
 
 # Create a function to handle adding a new product to the database.   
