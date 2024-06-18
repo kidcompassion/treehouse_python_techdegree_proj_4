@@ -29,7 +29,8 @@ def submenu(selection):
     elif selection == "A":
         add_product()
     elif selection =="B":
-        print("Export DB")
+        #print('example')
+        export_csv()
     else:
         pass
 
@@ -138,10 +139,28 @@ def delete_product(product_id):
 
 
 def export_csv():
-    pass
-    #Create a function to handle making a backup of the database. The backup should be written to a .csv file.
+     
+   
+    export_body = []
+    my_id = 0
+    for product in session.query(Product):
+        row = {
+            "product_id": product.product_id, 
+            "product_name": product.product_name, 
+            "product_quantity" : product.product_quantity, 
+            "product_price": product.product_price, 
+            "date_updated" : product.date_updated
+            }
+        export_body.append(row)
+        
+    
+   
+    with open('my_export.csv', 'a') as csvfile:
+         fieldnames = ["product_id", "product_name", "product_quantity", "product_price", "date_updated"]
+         rowwriter = csv.DictWriter(csvfile, fieldnames= fieldnames)
 
-
+         rowwriter.writeheader()
+         rowwriter.writerows(export_body)
 
 def display_price(cleaned_price):
     return cleaned_price/100
@@ -167,25 +186,6 @@ def add_csv():
         session.commit()
           
    
-   
-
-# def add_csv():
-#     with open('suggested_books.csv') as csvfile:
-#         data = csv.reader(csvfile)
-#         for row in data:
-#             book_in_db = session.query(Book).filter(Book.title==row[0]).one_or_none()
-#             if book_in_db == None:
-#                 date = clean_date(row[2])
-#                 title = row[0]
-#                 author = row[1]
-#                 price = clean_price(row[3])
-#                 new_book = Book(title = title,author = author, published_date = date, price = price)
-#                 session.add(new_book)
-
-#         session.commit()
-            
-
-
 
 
 
