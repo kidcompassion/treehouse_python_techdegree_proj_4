@@ -18,13 +18,13 @@ def menu():
         submenu(selected)
     else:
         input('''
-                \n Your selection was not valid.
-                \r Press enter to review your options and try again.
+                \n ******Your selection was not valid.*******
+                \n Press enter to review your options and try again.
             ''')
 
 def submenu(selection):
     if selection == "V":
-        requested_id = input("Enter ID of product ")
+        requested_id = input("\rEnter ID of product ")
         display_product(requested_id)
     elif selection == "A":
         add_product()
@@ -73,8 +73,8 @@ def clean_id(str_id, all_values):
         selected_id = int(str_id)
     except ValueError:
         input('''
-                \n *** Sorry, that's not a valid number. ***
-                \r Press Enter to return to the main menu and try your request again.
+                \n **** Sorry, that's not a valid number. ***
+                \n Press ENTER to return to the main menu and try your request again.
             ''')
     else:
         # if entered value is an integer, check if it's an active product ID
@@ -83,7 +83,7 @@ def clean_id(str_id, all_values):
         else:
             input('''
                 \n ***Sorry, that's not a valid product ID.***
-                \r Press Enter to return to the main menu and try your request again.
+                \n Press ENTER to return to the main menu and try your request again.
             ''')
 
        
@@ -120,7 +120,7 @@ def display_product(product_id):
         # Delay the next step for a second, just to make it nicer for the user when reading
         time.sleep(1)
         # Let the user go back to the main menu
-        input("Press ENTER to return to the main menu, whenver you are ready.")
+        input("\nPress ENTER to return to the main menu, whenever you are ready.")
         menu()
 
 
@@ -165,6 +165,15 @@ def delete_product(product_id):
     #selected_product = session.query(Product).filter(Product.product_id==product_id).first()
 
 
+def format_price(price_int):
+    float = price_int/100
+    decimal_positions = format(float, '.2f')
+    return "$"+decimal_positions
+
+def format_date():
+    pass
+
+
 def export_csv():
     # This will hold the queried data
     export_body = []
@@ -174,10 +183,11 @@ def export_csv():
             "product_id": product.product_id, 
             "product_name": product.product_name, 
             "product_quantity" : product.product_quantity, 
-            "product_price": product.product_price, 
+            "product_price": format_price(product.product_price), 
             "date_updated" : product.date_updated
             }
         export_body.append(row)
+        format_price(product.product_price)
         
     
     # generate export csv
