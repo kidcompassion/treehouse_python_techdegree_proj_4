@@ -128,8 +128,7 @@ def display_product(product_id):
 
 
 # Create a function to handle adding a new product to the database.   
-def add_product():
-    
+def add_product():  
     # prompt the user to enter the product's name, quantity, and price
     product_name = input("What is the product's name?")
     product_quantity = input("How many are there?")
@@ -137,14 +136,13 @@ def add_product():
     
     #check to see if this product already exists; if it does, set boolean to "true"
     exists = bool(session.query(Product).filter(Product.product_name==product_name).scalar())
-    print(exists)
     #if product exists, instead of adding a second, update the existing one
     if exists == True:
        update_product(product_name, product_quantity, product_price)
-    # else:
-    #     new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = clean_price(product_price), date_updated = datetime.datetime.now())
-    #     session.add(new_product)
-    #     session.commit()
+    else:
+        new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = clean_price(product_price), date_updated = datetime.datetime.now())
+        session.add(new_product)
+        session.commit()
   
     # process the user-provided value for price from a string to an int
     # Be sure the value you stored for the price field to the database is converted to cents ($2.99 becomes 299, for example).
