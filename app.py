@@ -35,6 +35,12 @@ def submenu(selection):
         pass
 
 
+def clean_product(product_name):
+    cleaned_product = product_name.split('"')
+    print(cleaned_product[0])
+    return cleaned_product[0]
+
+
 def clean_date(date_str):
     # Split date from CSV
     cleaned_date = date_str.split('/')
@@ -44,6 +50,7 @@ def clean_date(date_str):
 
 def clean_price(price_str):
     cleaned_price = price_str.split("$")
+    print(cleaned_price)
     cleaned_price = float(cleaned_price[1])*100
     cleaned_price = str(cleaned_price).split('.')
     cleaned_price = int(cleaned_price[0])
@@ -83,6 +90,7 @@ def clean_id(str_id, all_values):
 # Create a function to handle getting and displaying a product by its product_id.
 def display_product(product_id):    
 
+    
     # assume there is an error
     id_error = True 
 
@@ -101,6 +109,7 @@ def display_product(product_id):
         # Query to retrieve product matching requested ID
         selected_product = session.query(Product).filter(Product.product_id==product_id).first()
         # Print product details
+
         print(f'''
             \nID: {selected_product.product_id}
             \rProduct: {selected_product.product_name}
@@ -139,10 +148,9 @@ def delete_product(product_id):
 
 
 def export_csv():
-     
-   
+    # This will hold the queried data
     export_body = []
-    my_id = 0
+    # Query for all products
     for product in session.query(Product):
         row = {
             "product_id": product.product_id, 
@@ -154,13 +162,16 @@ def export_csv():
         export_body.append(row)
         
     
-   
-    with open('my_export.csv', 'a') as csvfile:
+    # generate export csv
+    with open('backup.csv', 'w') as csvfile:
          fieldnames = ["product_id", "product_name", "product_quantity", "product_price", "date_updated"]
          rowwriter = csv.DictWriter(csvfile, fieldnames= fieldnames)
-
          rowwriter.writeheader()
          rowwriter.writerows(export_body)
+
+    # return success message
+    time.sleep(1)
+    print("Export complete")
 
 def display_price(cleaned_price):
     return cleaned_price/100
@@ -175,7 +186,7 @@ def add_csv():
         for row in incoming_data:  
             product_exists = session.query(Product).filter(Product.product_name==row[0]).one_or_none()
             if product_exists == None:      
-                product_name = row[0]
+                product_name = clean_product(row[0])
                 product_price = clean_price(row[1])
                 product_quantity = int(row[2])
                 date_updated = clean_date(row[3])
@@ -192,7 +203,10 @@ def add_csv():
 def app():
     app_running = True
     while app_running:
+        # if the db is empty, read in the csv
+        add_csv()
         menu()
+        
 
 
 
@@ -202,6 +216,6 @@ def app():
 
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
-    app()
+    app = app()
 
    
