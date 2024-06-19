@@ -170,9 +170,14 @@ def format_price(price_int):
     decimal_positions = format(float, '.2f')
     return "$"+decimal_positions
 
-def format_date():
-    pass
-
+def format_date(date_str):
+    my_date = date_str.strftime("%m/%d/%Y").split("/")
+    month = int(my_date[0])
+    date = int(my_date[1])
+    year = my_date[2]
+    
+    revised_info = str(month) + "/" + str(date) + "/" + year
+    return revised_info
 
 def export_csv():
     # This will hold the queried data
@@ -180,19 +185,18 @@ def export_csv():
     # Query for all products
     for product in session.query(Product):
         row = {
-            "product_id": product.product_id, 
+            #"product_id": product.product_id, 
             "product_name": product.product_name, 
             "product_quantity" : product.product_quantity, 
             "product_price": format_price(product.product_price), 
-            "date_updated" : product.date_updated
+            "date_updated" : format_date(product.date_updated)
             }
         export_body.append(row)
-        format_price(product.product_price)
         
     
     # generate export csv
     with open('backup.csv', 'w') as csvfile:
-         fieldnames = ["product_id", "product_name", "product_quantity", "product_price", "date_updated"]
+         fieldnames = ["product_name", "product_price", "product_quantity", "date_updated"]
          rowwriter = csv.DictWriter(csvfile, fieldnames= fieldnames)
          rowwriter.writeheader()
          rowwriter.writerows(export_body)
@@ -219,13 +223,10 @@ def add_csv():
                 product_quantity = int(row[2])
                 date_updated = clean_date(row[3])
                 new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = product_price, date_updated=date_updated)
-                print(new_product)
-                session.add(new_product)
-            
+                session.add(new_product)            
         
         session.commit()
-          
-   
+
 
 
 
