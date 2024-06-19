@@ -124,22 +124,42 @@ def display_product(product_id):
         menu()
 
 
+
+
+
 # Create a function to handle adding a new product to the database.   
 def add_product():
+    
     # prompt the user to enter the product's name, quantity, and price
     product_name = input("What is the product's name?")
     product_quantity = input("How many are there?")
     product_price = input("Enter price in $0.00 format.")
-    new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = clean_price(product_price), date_updated = datetime.datetime.now())
-    session.add(new_product)
-    session.commit()
+    
+    #check to see if this product already exists; if it does, set boolean to "true"
+    exists = bool(session.query(Product).filter(Product.product_name==product_name).scalar())
+    print(exists)
+    #if product exists, instead of adding a second, update the existing one
+    if exists == True:
+       update_product(product_name, product_quantity, product_price)
+    # else:
+    #     new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = clean_price(product_price), date_updated = datetime.datetime.now())
+    #     session.add(new_product)
+    #     session.commit()
   
     # process the user-provided value for price from a string to an int
     # Be sure the value you stored for the price field to the database is converted to cents ($2.99 becomes 299, for example).
-    print(new_product)
 
-def update_product():
-    pass
+def update_product(product_name, product_qty, product_price):
+        session.query(Product).filter(Product.product_name==product_name).update({
+            Product.product_quantity: product_qty,
+            Product.product_price: clean_price(product_price),
+            Product.date_updated: datetime.datetime.now()
+        })
+        session.commit()
+    #if product does not exist, just submit it as its own thing
+    # process the user-provided value for price from a string to an int
+    # Be sure the value you stored for the price field to the database is converted to cents ($2.99 becomes 299, for example).
+
 
 def delete_product(product_id):
     session.query(Product).filter(Product.product_id==product_id).delete()
@@ -193,6 +213,7 @@ def add_csv():
                 new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = product_price, date_updated=date_updated)
                 print(new_product)
                 session.add(new_product)
+            
         
         session.commit()
           
@@ -217,5 +238,5 @@ def app():
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
     app = app()
-
+    update_product()
    
