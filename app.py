@@ -29,7 +29,6 @@ def submenu(selection):
     elif selection == "A":
         add_product()
     elif selection =="B":
-        #print('example')
         export_csv()
     else:
         pass
@@ -37,7 +36,6 @@ def submenu(selection):
 
 def clean_product(product_name):
     cleaned_product = product_name.split('"')
-    print(cleaned_product[0])
     return cleaned_product[0]
 
 
@@ -50,7 +48,6 @@ def clean_date(date_str):
 
 def clean_price(price_str):
     cleaned_price = price_str.split("$")
-    print(cleaned_price)
     cleaned_price = float(cleaned_price[1])*100
     cleaned_price = str(cleaned_price).split('.')
     cleaned_price = int(cleaned_price[0])
