@@ -127,9 +127,9 @@ def display_product(product_id):
 # Create a function to handle adding a new product to the database.   
 def add_product():  
     # prompt the user to enter the product's name, quantity, and price
-    product_name = input("What is the product's name?")
-    product_quantity = input("How many are there?")
-    product_price = input("Enter price in $0.00 format.")
+    product_name = input("What is the product's name? ")
+    product_quantity = input("How many are there? ")
+    product_price = input("Enter price in $0.00 format. ")
     
     #check to see if this product already exists; if it does, set boolean to "true"
     exists = bool(session.query(Product).filter(Product.product_name==product_name).scalar())
