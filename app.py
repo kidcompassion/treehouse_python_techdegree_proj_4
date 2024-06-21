@@ -15,7 +15,7 @@ def menu():
 
     # Validate user's entry
     if selected in ['V','A','B']:
-        submenu(selected)
+        return submenu(selected)
     else:
         input('''
                 \n ******Your selection was not valid.*******
@@ -24,12 +24,12 @@ def menu():
 
 def submenu(selection):
     if selection == "V":
-        requested_id = input("\rEnter ID of product ")
-        display_product(requested_id)
+        return display_product()   
+        
     elif selection == "A":
-        add_product()
+        return add_product()
     elif selection =="B":
-        export_csv()
+        return export_csv()
     else:
         pass
 
@@ -85,9 +85,9 @@ def clean_id(str_id, all_values):
 
        
 # Create a function to handle getting and displaying a product by its product_id.
-def display_product(product_id):    
-
+def display_product():    
     
+    requested_id = input("\rEnter ID of product ")
     # assume there is an error
     id_error = True 
 
@@ -96,17 +96,17 @@ def display_product(product_id):
 
     # pass requested id and list of ids into cleaning function. 
     # it will return either a valid int, or a value of None
-    id_selected = clean_id(product_id, all_ids)
+    id_selected = clean_id(requested_id, all_ids)
 
     # if it does not return None, assume the value is okay and switch off the error, 
     if id_selected != None:
         id_error = False
 
-    while id_error == False:
+    if id_error == False:
         # Query to retrieve product matching requested ID
-        selected_product = session.query(Product).filter(Product.product_id==product_id).first()
+        selected_product = session.query(Product).filter(Product.product_id==requested_id).first()
         # Print product details
-
+        
         print(f'''
             \nID: {selected_product.product_id}
             \rProduct: {selected_product.product_name}
@@ -117,11 +117,8 @@ def display_product(product_id):
         # Delay the next step for a second, just to make it nicer for the user when reading
         time.sleep(1)
         # Let the user go back to the main menu
-        input("\nPress ENTER to return to the main menu, whenever you are ready.")
-        menu()
-
-
-
+    input("\nPress ENTER to return to the main menu, whenever you are ready.")
+    menu()
 
 
 # Create a function to handle adding a new product to the database.   
@@ -131,35 +128,11 @@ def add_product():
     product_quantity = input("How many are there? ")
     product_price = input("Enter price in $0.00 format. ")
     
-    #check to see if this product already exists; if it does, set boolean to "true"
-    exists = bool(session.query(Product).filter(Product.product_name==product_name).scalar())
-    #if product exists, instead of adding a second, update the existing one
-    if exists == True:
-       update_product(product_name, product_quantity, product_price)
-    else:
-        new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = clean_price(product_price), date_updated = datetime.datetime.now())
-        session.add(new_product)
-        session.commit()
-  
-    # process the user-provided value for price from a string to an int
-    # Be sure the value you stored for the price field to the database is converted to cents ($2.99 becomes 299, for example).
-
-def update_product(product_name, product_qty, product_price):
-        session.query(Product).filter(Product.product_name==product_name).update({
-            Product.product_quantity: product_qty,
-            Product.product_price: clean_price(product_price),
-            Product.date_updated: datetime.datetime.now()
-        })
-        session.commit()
-    #if product does not exist, just submit it as its own thing
-    # process the user-provided value for price from a string to an int
-    # Be sure the value you stored for the price field to the database is converted to cents ($2.99 becomes 299, for example).
-
-
-def delete_product(product_id):
-    session.query(Product).filter(Product.product_id==product_id).delete()
+    new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = clean_price(product_price), date_updated = datetime.datetime.now())
+    session.add(new_product)
     session.commit()
-    #selected_product = session.query(Product).filter(Product.product_id==product_id).first()
+  
+    
 
 
 def format_price(price_int):
@@ -182,7 +155,6 @@ def export_csv():
     # Query for all products
     for product in session.query(Product):
         row = {
-            #"product_id": product.product_id, 
             "product_name": product.product_name, 
             "product_quantity" : product.product_quantity, 
             "product_price": format_price(product.product_price), 
@@ -199,7 +171,7 @@ def export_csv():
          rowwriter.writerows(export_body)
 
     # return success message
-    time.sleep(1)
+    
     print("Export complete")
 
 def display_price(cleaned_price):
@@ -244,5 +216,4 @@ def app():
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
     app = app()
-    update_product()
    
