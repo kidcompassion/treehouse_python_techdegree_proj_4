@@ -15,7 +15,6 @@ class Product(Base):
     product_price = Column('product_price', Integer)
     date_updated = Column('date_updated', Date)
 
-
     def __repr__(self):
         return f'Product: {self.product_name} | Quantity: {self.product_quantity} | Price {self.product_price} | Date updated: {self.date_updated})>'
     

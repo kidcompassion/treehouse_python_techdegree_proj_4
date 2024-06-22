@@ -123,55 +123,46 @@ def display_product():
 
 # Create a function to handle adding a new product to the database.   
 def add_product():  
-    # prompt the user to enter the product's name, quantity, and price
-    
+    # Set flags to tell when each field passes validation
     validate_name = False
     validate_qty = False
     validate_price = False
+
+    #Ask for product name
     product_name = input("What is the product's name? ")
     
+    #Stay on product name until it passes validation
     while product_name == "":
-
+        # Display error
         print("Product name cannot be empty. Please try again.")
+        # Add a second delay to improve readability
         time.sleep(1)
+        # Try again
         product_name = input("What is the product's name? ")
+        # If it validates, switch the flag to True
         validate_name = True
-        #raise Exception("Invalid Name")
-        #restart
     
+    #Stay on product quantity name until it passes validation
     product_quantity = input("How many are there? ")
     while (product_quantity == "") or (not product_quantity.isdigit()):
         print("Quantity must be a number and cannot be empty. Please try again.")
         time.sleep(1)
         product_quantity = input("How many are there? ")
         validate_qty = True
-        
-            #restart
-        
+
+    #Stay on product price until it passes validation        
     product_price = input("Enter price in $0.00 format. ")
     while (product_price =="") or (product_price[0] != "$") or (product_price[-3] != "."):
         print("Invalid format. Please enter price in $0.00 format only. Try again.")
         time.sleep(1)
         product_price = input("Enter price in $0.00 format. ")
         validate_price = True
-        #raise Exception("Invalid Format")
-    
-
-            
+        
+    # once all three pass validation, add them to db     
     if (validate_name == True) and (validate_qty == True) and (validate_price == True):
         new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = clean_price(product_price), date_updated = datetime.datetime.now())
         session.add(new_product)
         session.commit()
-
-   
-  
-
-    
-  
-
-  
-    
-
 
 def format_price(price_int):
     float = price_int/100
@@ -183,7 +174,6 @@ def format_date(date_str):
     month = int(my_date[0])
     date = int(my_date[1])
     year = my_date[2]
-    
     revised_info = str(month) + "/" + str(date) + "/" + year
     return revised_info
 
@@ -200,7 +190,6 @@ def export_csv():
             }
         export_body.append(row)
         
-    
     # generate export csv
     with open('backup.csv', 'w') as csvfile:
          fieldnames = ["product_name", "product_price", "product_quantity", "date_updated"]
@@ -208,13 +197,14 @@ def export_csv():
          rowwriter.writeheader()
          rowwriter.writerows(export_body)
 
+    # Delay for better readability
+    time.sleep(1)
     # return success message
-    
-    print("Export complete")
+    print("\nExport complete")
+    time.sleep(1)
 
 def display_price(cleaned_price):
     return cleaned_price/100
-
 
 def add_csv():
     counter = 0
@@ -231,11 +221,8 @@ def add_csv():
                 date_updated = clean_date(row[3])
                 new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = product_price, date_updated=date_updated)
                 session.add(new_product)            
-        
+    
         session.commit()
-
-
-
 
 def app():
     app_running = True
