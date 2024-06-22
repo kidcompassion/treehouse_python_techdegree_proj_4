@@ -124,13 +124,51 @@ def display_product():
 # Create a function to handle adding a new product to the database.   
 def add_product():  
     # prompt the user to enter the product's name, quantity, and price
-    product_name = input("What is the product's name? ")
-    product_quantity = input("How many are there? ")
-    product_price = input("Enter price in $0.00 format. ")
     
-    new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = clean_price(product_price), date_updated = datetime.datetime.now())
-    session.add(new_product)
-    session.commit()
+    validate_name = False
+    validate_qty = False
+    validate_price = False
+    product_name = input("What is the product's name? ")
+    
+    while product_name == "":
+
+        print("Product name cannot be empty. Please try again.")
+        time.sleep(1)
+        product_name = input("What is the product's name? ")
+        validate_name = True
+        #raise Exception("Invalid Name")
+        #restart
+    
+    product_quantity = input("How many are there? ")
+    while (product_quantity == "") or (not product_quantity.isdigit()):
+        print("Quantity must be a number and cannot be empty. Please try again.")
+        time.sleep(1)
+        product_quantity = input("How many are there? ")
+        validate_qty = True
+        
+            #restart
+        
+    product_price = input("Enter price in $0.00 format. ")
+    while (product_price =="") or (product_price[0] != "$") or (product_price[-3] != "."):
+        print("Invalid format. Please enter price in $0.00 format only. Try again.")
+        time.sleep(1)
+        product_price = input("Enter price in $0.00 format. ")
+        validate_price = True
+        #raise Exception("Invalid Format")
+    
+
+            
+    if (validate_name == True) and (validate_qty == True) and (validate_price == True):
+        new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = clean_price(product_price), date_updated = datetime.datetime.now())
+        session.add(new_product)
+        session.commit()
+
+   
+  
+
+    
+  
+
   
     
 
