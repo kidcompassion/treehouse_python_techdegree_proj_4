@@ -123,6 +123,7 @@ def display_product():
 
 # Create a function to handle adding a new product to the database.   
 def add_product():  
+    
     # Set flags to tell when each field passes validation
     validate_name = False
     validate_qty = False
@@ -163,6 +164,64 @@ def add_product():
         new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = clean_price(product_price), date_updated = datetime.datetime.now())
         session.add(new_product)
         session.commit()
+
+
+def update_product(import_type, incoming_date, product_name):
+
+    # Check if this is the CSV
+    
+    if import_type == "csv":
+ 
+
+        # product_name = "Red Currants"
+        # incoming_date = "12-8-2024 00:00:00"
+        
+        # check to see if this product already exists; if it does, set boolean to "true"
+        # https://docs.sqlalchemy.org/en/14/orm/query.html#sqlalchemy.orm.Query.scalar
+        # Scalar returns either the result, or "None" instead of exception
+        existing_product = session.query(Product).filter(Product.product_name==product_name).scalar()
+        
+        incoming_date_formatted = datetime.datetime.strptime(incoming_date,"%m-%d-%Y %H:%M:%S")
+
+
+        db_date= existing_product.date_updated
+        db_date_str = db_date.strftime("%m-%d-%Y %H:%M:%S")
+        db_date_formatted = datetime.datetime.strptime(db_date_str,"%m-%d-%Y %H:%M:%S")
+
+        existing_bool = bool(existing_product)
+
+        # import csv
+        # if there is already a product by this name
+        if existing_bool == True:
+
+            if incoming_date_formatted.timestamp() > db_date_formatted.timestamp():
+                print("incoming")
+                print(incoming_date_formatted.timestamp())
+                #set fields to use incoming_date_formatted info
+            
+            elif db_date_formatted.timestamp() < incoming_date_formatted.timestamp():
+            
+                print("db_date")
+                print(db_date_formatted.timestamp())
+                #set fields to use db_date_formatted info
+        
+            
+        # else:
+        #     print("False")
+        
+        # #exists = bool(queried_product.scalar())
+        #if exists == True:
+            #print(queried_product.date_updated)
+
+        # if row exists, compare its date with the one provided
+    # if exists == True:
+        #     stored_date = session.query(Product).filter(Product.product_name==product_name)
+        #     #get db 
+        # take newest content and save it under title
+        #
+
+
+
 
 def format_price(price_int):
     float = price_int/100
@@ -208,6 +267,7 @@ def display_price(cleaned_price):
 
 def add_csv():
     counter = 0
+    #update_product('csv')
     with open('inventory.csv') as csvfile:
         incoming_data = csv.reader(csvfile)
         # Skip the header row
@@ -220,7 +280,9 @@ def add_csv():
                 product_quantity = int(row[2])
                 date_updated = clean_date(row[3])
                 new_product = Product(product_name = product_name, product_quantity = product_quantity, product_price = product_price, date_updated=date_updated)
-                session.add(new_product)            
+                session.add(new_product)  
+            else:
+                update_product('csv',"12-8-2024 00:00:00", "Red Currants")          
     
         session.commit()
 
@@ -228,17 +290,15 @@ def app():
     app_running = True
     while app_running:
         # if the db is empty, read in the csv
+        
         add_csv()
         menu()
         
-
-
-
-
-
+        
 
 
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
     app = app()
+    
    
